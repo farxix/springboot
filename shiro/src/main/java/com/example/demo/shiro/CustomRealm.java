@@ -33,10 +33,10 @@ public class CustomRealm extends AuthorizingRealm {
         // 据库主键，LDAP UUID或静态DN 或者是用户唯一的用户名。
         // 所以说这个值 必须唯一，你可以选择 邮箱，或者 手机号，身份证号等等。
 
-        User userName =  (User) principalCollection.getPrimaryPrincipal();
+        User object =  (User) principalCollection.getPrimaryPrincipal();
 
         // 根据用户名去数据库查询用户信息
-        User user = loginService.getUserByName(userName.getUserName());
+        User user = loginService.getUserByName(object.getUserName());
 
         // 添加角色和权限
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
@@ -76,12 +76,10 @@ public class CustomRealm extends AuthorizingRealm {
         //事实上,Shiro往Redis存Session信息的时候是在调用subject.login(token);方法执行的,
         // 所以当用户认证成功之后,说明用户具有登录的资格,这时候才会清除session进行踢人功能的实现.
         // 类似两个账号登录，会强制下线一个账号。
-//        ShiroUtils.deleteCache(name,true);
+        ShiroUtils.deleteCache(name,true);
 
 
 //        原先这里SimpleAuthenticationInfo构造的时候传入的是username，而redis做缓存是需要key，value的，这里必须要传入user，获取id做key.
-
-
         return new SimpleAuthenticationInfo(user,user.getPassword(), ByteSource.Util.bytes(user.getSalt()),getName());
 
         // 验证成功开始踢人(清除缓存和Session)
